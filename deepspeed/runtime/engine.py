@@ -1159,7 +1159,17 @@ class DeepSpeedEngine(Module):
         self._check_for_duplicates(basic_optimizer)
 
         self.basic_optimizer = basic_optimizer
-        log_dist("DeepSpeed Basic Optimizer = {}".format(basic_optimizer.__class__.__name__), ranks=[0])
+        #log_dist("Basic Optimizer = {}".format(basic_optimizer.__class__.__name__), ranks=[0])
+        provider_name = type(basic_optimizer).__module__.split('.')[0]
+        optimizer_name = basic_optimizer.__class__.__name__
+
+        if 'Fuse' or 'fuse' in optimizer_name:
+            fuse_status = 'Fused'
+        else:
+            fuse_status = 'NonFused'
+        log_dist("Optimizer Provider: {}".format(provider_name), ranks=[0])
+        log_dist("Fuse Status: {}".format(fuse_status), ranks=[0])
+        log_dist("Optimizer Name: {}".format(optimizer_name), ranks=[0])
 
         optimizer_wrapper = self._do_optimizer_sanity_check(basic_optimizer)
 
